@@ -5,5 +5,5 @@
 @tailwind utilities;
 
 body {
-	@apply bg-primary-25;
+	@apply bg-primary-25 text-metal-900;
 }

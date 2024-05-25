@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 import AppBar from '../components/AppBar/AppBar';
-import Footer from '../components/Footer/Footer';
 import { onAuthStateChangeList } from '../firebase/utils/firebase_auth_utils';
 import { User } from 'firebase/auth';
 import { useDispatch, useSelector } from 'react-redux';
@@ -40,16 +39,14 @@ const RootLayout: React.FC = () => {
 		return <Loading_Screen />
 	}
 
-
 	return (
 		<>
 			<AppBar />
 			<main
-				className={ `min-h-[calc(100dvh-20dvh)] bg-white container my-5 rounded-2xl mx-auto` }
+				className={ `bg-white container my-5 rounded-2xl mx-auto` }
 			>
 				<Outlet />
 			</main>
-			<Footer />
 		</>
 	);
 };
