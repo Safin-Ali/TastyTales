@@ -1,12 +1,13 @@
 import { Button, Navbar, Input, Icon } from "keep-react";
-import { PiGoogleLogo } from "react-icons/pi";
 import { HiOutlineMagnifyingGlass } from "react-icons/hi2";
 import Private_NavLinks from '../../private/components/AppBar/Private_NavLinks';
 import Current_Users from '../../private/components/AppBar/Current_Users';
 import { useLocation } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
 import User_Coins from '../../private/components/AppBar/User_Coins';
+import { google_redirect_auth } from '../../firebase/utils/firebase_auth_utils';
+import { authStateChecker } from '../../redux/slicer/userData_slicer';
 
 const routes = [
 	{
@@ -23,15 +24,19 @@ const AppBar: React.FC = () => {
 
 	const { pathname } = useLocation();
 
-	const { userAuth } = useSelector((state: RootState) => state.userData)
+	const { userAuth } = useSelector((state: RootState) => state.userData);
+
+	const dispatch = useDispatch();
 
 	return (
 		<Navbar
 			fluid={ true }
 			bordered
 		>
-			<Navbar.Container className="flex w-full justify-between items-center">
-				<Navbar.Container className="flex items-center">
+			<Navbar.Container
+				className="flex w-full justify-between items-center">
+				<Navbar.Container
+					className="flex items-center">
 					<Navbar.Brand
 						className={ `text-heading-5` }
 					>
@@ -44,8 +49,9 @@ const AppBar: React.FC = () => {
 					>
 
 						{
-							routes.map(({ label, path }) => {
+							routes.map(({ label, path }, idx) => {
 								return <Navbar.Link
+									key={ idx }
 									href={ path }
 									className={ `${path === pathname ? '[&>span]:text-primary-500' : '[&>span]:hover:text-primary-500'}` }
 									linkName={ label }
@@ -72,8 +78,9 @@ const AppBar: React.FC = () => {
 
 						>
 							{
-								routes.map(({ label, path }) => {
+								routes.map(({ label, path }, idx) => {
 									return <Navbar.Link
+										key={ idx }
 										href={ path }
 										className={ `${path === pathname ? '[&>span]:text-primary-500' : '[&>span]:hover:text-primary-500'}` }
 										linkName={ label }
@@ -115,13 +122,16 @@ const AppBar: React.FC = () => {
 					}
 
 					<div>
-						<button>
+						<div>
 							{
 								userAuth
 									?
-									<Current_Users />
+									<Current_Users userData={ userAuth } />
 									:
 									<Button
+										onClick={ () => {
+											!userAuth && google_redirect_auth()
+										} }
 										size={ 'sm' }
 									>
 										Sign In
@@ -130,7 +140,7 @@ const AppBar: React.FC = () => {
 							}
 
 
-						</button>
+						</div>
 					</div>
 				</Navbar.Container>
 

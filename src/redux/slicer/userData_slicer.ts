@@ -1,27 +1,33 @@
-import { createSlice } from '@reduxjs/toolkit'
+import { PayloadAction, createSlice } from '@reduxjs/toolkit'
+import { User } from 'firebase/auth'
 
 export interface UserState {
-	userAuth:string | null
+	userAuth: User | null,
+	authStateChecked: boolean
 }
 
 const userInitState: UserState = {
-	userAuth:null
+	userAuth: null,
+	authStateChecked: false
 }
 
 export const userDataSlice = createSlice({
 	name: 'counter',
-	initialState:userInitState,
+	initialState: userInitState,
 	reducers: {
-		signIn:(state) => {
-			state.userAuth = 'singed'
+		signIn: (state, action: PayloadAction<User | null>) => {
+			state.userAuth = action.payload
 		},
-		signOut:(state) => {
+		signOut: (state) => {
 			state.userAuth = null
+		},
+		authStateChecker: (state, action: PayloadAction<boolean>) => {
+			state.authStateChecked = action.payload
 		}
 	},
 })
 
 // Action creators are generated for each case reducer function
-export const { signIn,signOut } = userDataSlice.actions
+export const { signIn, signOut, authStateChecker } = userDataSlice.actions
 
 export default userDataSlice.reducer

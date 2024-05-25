@@ -4,9 +4,12 @@ import userDataReducer from './slicer/userData_slicer'
 
 export const store = configureStore({
 	reducer: {
-		counter:counterReducer,
-		userData:userDataReducer
+		counter: counterReducer,
+		userData: userDataReducer
 	},
+	middleware: getDefaultMiddleware => getDefaultMiddleware({
+		serializableCheck: false
+	})
 })
 
 export type RootState = ReturnType<typeof store.getState>
