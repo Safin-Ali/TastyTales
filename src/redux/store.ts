@@ -1,9 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit'
 import counterReducer from './slicer/counter_slicer'
+import userDataReducer from './slicer/userData_slicer'
 
 export const store = configureStore({
 	reducer: {
-		counter:counterReducer
+		counter:counterReducer,
+		userData:userDataReducer
 	},
 })
 
