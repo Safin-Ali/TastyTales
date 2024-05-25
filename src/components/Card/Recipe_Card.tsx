@@ -1,23 +1,27 @@
-import { Button } from 'keep-react';
 import React from 'react';
-import { FaRegHeart } from "react-icons/fa";
-import { HiOutlineMail } from "react-icons/hi";
-import { FaEye } from "react-icons/fa";
+import { FaRegHeart, FaEye } from "react-icons/fa";
+import { useSelector } from 'react-redux';
+import { RootState } from '../../redux/store';
+import { Button, toast } from 'keep-react';
+import { google_redirect_auth } from '../../firebase/utils/firebase_auth_utils';
+import { AlertModalHandler } from '../../pages/recipes/Recipes_Page';
 
 export interface RecipesShortInfo {
-	id: string,
-	purchased: number,
-	reacts: number,
-	recipeName: string,
-	creatorEmail: string,
-	recipeImage: string,
-	category: string,
-	watchCount:number,
-	country: string
+	id: string;
+	purchased: number;
+	reacts: number;
+	recipeName: string;
+	creatorEmail: string;
+	recipeImage: string;
+	watchCount: number;
+	country: string;
 }
 
-const Recipes_Card: React.FC<RecipesShortInfo> = ({
-	category,
+interface Props extends  RecipesShortInfo{
+	alertModalHandler:AlertModalHandler
+}
+
+const RecipesCard: React.FC<Props> = ({
 	country,
 	id,
 	purchased,
@@ -25,67 +29,71 @@ const Recipes_Card: React.FC<RecipesShortInfo> = ({
 	creatorEmail,
 	recipeImage,
 	watchCount,
+	alertModalHandler,
 	recipeName
 }) => {
+	const { userAuth,coins } = useSelector((state: RootState) => state.userData);
+
+	const handleDetails = () => {
+		if (!userAuth) {
+			toast('You need to LogIn', {
+				action: {
+					label: 'Sign In',
+					onClick: () => google_redirect_auth(),
+				},
+			});
+		} else if (userAuth.email === creatorEmail) {
+			// visit details page to the user
+		} else if (userAuth && coins < 10) {
+			// redirect user to the coin purchase page
+		} else if(userAuth && coins > 10) {
+			alertModalHandler(true)
+		}
+
+
+	};
 
 	return (
-		<figure
-			className={ `border rounded-lg flex gap-[5%] mx-auto overflow-hidden` }
-		>
-
-			<div
-				className={ `w-[30%]` }
-			>
+		<article className="border rounded-lg flex gap-4 mx-auto overflow-hidden shadow-medium transition-transform transform hover:scale-[1.01] ease-linear max-w-2xl">
+			<div className="w-1/3">
 				<img
 					src={ recipeImage }
-					alt={ recipeName + '_thumb' }
+					alt={ `${recipeName} thumbnail` }
+					className="w-full h-full object-cover"
 				/>
 			</div>
 
-			<div className={ `flex justify-center flex-col` }>
-				<h4 className={ `text-heading-6 my-1.5 font-medium` }>{ recipeName }</h4>
+			<div className="flex flex-col justify-center p-4 w-2/3">
+				<h2 className="text-2xl font-medium mb-2">{ recipeName }</h2>
 
-				<div className={ `text-lg` }>
-					<div>
-						<address>
-							Creator Email: { creatorEmail }
-						</address>
-					</div>
+				<p className="text-sm text-gray-600"><strong>Creator Email:</strong> <a href={ `mailto:${creatorEmail}` } className="text-blue-500">{ creatorEmail }</a></p>
+				<p className="text-sm text-gray-600"><strong>Purchased:</strong> { purchased }</p>
+				<p className="text-sm text-gray-600"><strong>From:</strong> { country }</p>
 
-					<div>
-						Purchased: { 10 }
-					</div>
-
-					<div>
-						<span> From: { country }</span>
-					</div>
-
-					<div className={`my-2`}>
-						<div >
-							<Button size={ 'xs' }>Details</Button>
-						</div>
-					</div>
-
-					<div className={ `flex text-gray-500 items-center my-3 gap-5` }>
-						<div className={`cursor-pointer flex items-center flex-col`}>
-							<FaRegHeart size={ 20 } />
-							<span className={`text-sm`}>{reacts}</span>
-						</div>
-
-						<div className={`flex items-center flex-col`}>
-							<FaEye size={ 20 } />
-							<span className={`text-sm`}>{watchCount}</span>
-						</div>
-
-
-					</div>
+				<div className="mt-4">
+					<Button
+						size="xs"
+						onClick={ handleDetails }
+						className="text-white px-4 py-2 rounded"
+					>
+						Details
+					</Button>
 				</div>
 
+				<div className="flex text-gray-500 items-center mt-4 gap-5">
+					<div className="flex items-center flex-col cursor-pointer">
+						<FaRegHeart size={ 20 } />
+						<span className="text-sm">{ reacts }</span>
+					</div>
+
+					<div className="flex items-center flex-col">
+						<FaEye size={ 20 } />
+						<span className="text-sm">{ watchCount }</span>
+					</div>
+				</div>
 			</div>
-
-
-		</figure>
+		</article>
 	);
-}
+};
 
-export default Recipes_Card;
+export default RecipesCard;
