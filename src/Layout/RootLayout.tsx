@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { authStateChecker, signIn } from '../redux/slicer/userData_slicer';
 import Loading_Screen from '../pages/home/Loading_Screen';
 import { RootState } from '../redux/store';
+import { endpointApi } from '../utils/https-fetcher';
 
 const RootLayout: React.FC = () => {
 
@@ -18,19 +19,18 @@ const RootLayout: React.FC = () => {
 
 		if (user) {
 
-			const {displayName,email,photoURL} = user;
+			const { displayName, email, photoURL } = user;
 
-			const userCredential = (await (await fetch(`http://localhost:5000/api/users/register`,{
-				method:'POST',
-				headers:{
+			const userCredential = await (await endpointApi.post('/users/register', {
+				headers: {
 					"Content-Type": "application/json",
 				},
-				body:JSON.stringify({
+				body: JSON.stringify({
 					displayName,
 					photoURL,
 					email
 				})
-			})).json());
+			})).json()
 
 			dispatch(signIn(userCredential));
 		} else {
