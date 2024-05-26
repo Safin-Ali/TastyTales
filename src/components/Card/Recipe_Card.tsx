@@ -1,10 +1,12 @@
-import React from 'react';
-import { FaRegHeart, FaEye } from "react-icons/fa";
-import { useSelector } from 'react-redux';
+import React, { useState } from 'react';
+import { FaRegHeart, FaEye, FaHeart } from "react-icons/fa";
+import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
 import { Button, toast } from 'keep-react';
 import { google_redirect_auth } from '../../firebase/utils/firebase_auth_utils';
 import { AlertModalHandler } from '../../pages/recipes/Recipes_Page';
+import { endpointApi } from '../../utils/https-fetcher';
+import { handleInstantReact } from '../../redux/slicer/userData_slicer';
 
 export interface RecipesShortInfo {
 	_id: string;
@@ -17,8 +19,8 @@ export interface RecipesShortInfo {
 	country: string;
 }
 
-interface Props extends  RecipesShortInfo{
-	alertModalHandler:AlertModalHandler
+interface Props extends RecipesShortInfo {
+	alertModalHandler: AlertModalHandler
 }
 
 const RecipesCard: React.FC<Props> = ({
@@ -34,6 +36,10 @@ const RecipesCard: React.FC<Props> = ({
 }) => {
 	const { userAuth } = useSelector((state: RootState) => state.userData);
 
+	const [reactsState,setReacts] = useState<number>(reacts);
+
+	const dispatch = useDispatch();
+
 	const handleDetails = () => {
 		if (!userAuth) {
 			toast('You need to LogIn', {
@@ -46,14 +52,41 @@ const RecipesCard: React.FC<Props> = ({
 			// visit details page to the user
 		} else if (userAuth && userAuth.coin < 10) {
 			// redirect user to the coin purchase page
-		} else if(userAuth && userAuth.coin > 10) {
+		} else if (userAuth && userAuth.coin > 10) {
 			alertModalHandler({
-				active:true,
-				recipeId:_id
+				active: true,
+				recipeId: _id
 			})
 		}
 
 
+	};
+
+	const existReact = userAuth?.reacts.includes(_id);
+
+	const handleReact = async () => {
+		const res = await endpointApi.patch(`/recipe/addReact`, {
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({
+				recipeId: _id,
+				userEmail: userAuth?.email
+			})
+		})
+
+		if (res.status === 200) {
+
+			const type = existReact ? 0 : 1
+			dispatch(
+				handleInstantReact({
+					id: _id,
+					type
+				})
+			)
+
+			setReacts(type === 0 ? reactsState-1 : reactsState+1)
+		}
 	};
 
 	return (
@@ -84,9 +117,19 @@ const RecipesCard: React.FC<Props> = ({
 				</div>
 
 				<div className="flex text-gray-500 items-center mt-4 gap-5">
-					<div className="flex items-center flex-col cursor-pointer">
-						<FaRegHeart size={ 20 } />
-						<span className="text-sm">{ reacts }</span>
+					<div
+						className={`flex items-center flex-col ${userAuth && 'cursor-pointer'}`}
+						onClick={ userAuth ? handleReact : () => null }
+						title={`${!userAuth ? 'Login to React' : 'Add React'}`}
+					>
+						{
+							existReact
+								?
+								<FaHeart size={ 20 } className={`fill-blue-600 `}/>
+								:
+								<FaRegHeart size={ 20 } />
+						}
+						<span className="text-sm">{ reactsState }</span>
 					</div>
 
 					<div className="flex items-center flex-col">
