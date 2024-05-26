@@ -7,7 +7,7 @@ import { google_redirect_auth } from '../../firebase/utils/firebase_auth_utils';
 import { AlertModalHandler } from '../../pages/recipes/Recipes_Page';
 
 export interface RecipesShortInfo {
-	id: string;
+	_id: string;
 	purchased: number;
 	reacts: number;
 	recipeName: string;
@@ -22,8 +22,8 @@ interface Props extends  RecipesShortInfo{
 }
 
 const RecipesCard: React.FC<Props> = ({
+	_id,
 	country,
-	id,
 	purchased,
 	reacts,
 	creatorEmail,
@@ -32,7 +32,7 @@ const RecipesCard: React.FC<Props> = ({
 	alertModalHandler,
 	recipeName
 }) => {
-	const { userAuth,coins } = useSelector((state: RootState) => state.userData);
+	const { userAuth } = useSelector((state: RootState) => state.userData);
 
 	const handleDetails = () => {
 		if (!userAuth) {
@@ -44,10 +44,13 @@ const RecipesCard: React.FC<Props> = ({
 			});
 		} else if (userAuth.email === creatorEmail) {
 			// visit details page to the user
-		} else if (userAuth && coins < 10) {
+		} else if (userAuth && userAuth.coin < 10) {
 			// redirect user to the coin purchase page
-		} else if(userAuth && coins > 10) {
-			alertModalHandler(true)
+		} else if(userAuth && userAuth.coin > 10) {
+			alertModalHandler({
+				active:true,
+				recipeId:_id
+			})
 		}
 
 
