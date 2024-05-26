@@ -3,9 +3,9 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../redux/store';
 import { logOutUser } from '../../../firebase/utils/firebase_auth_utils';
-import { User } from 'firebase/auth';
+import { UserCredential } from '../../../redux/slicer/userData_slicer';
 
-const Current_Users: React.FC<{ userData: User }> = ({ userData }) => {
+const Current_Users: React.FC<{ userData: UserCredential }> = ({ userData }) => {
 
 	const { userAuth } = useSelector((state: RootState) => state.userData);
 
@@ -13,6 +13,7 @@ const Current_Users: React.FC<{ userData: User }> = ({ userData }) => {
 
 	const {
 		photoURL
+
 	} = userData;
 
 	return (

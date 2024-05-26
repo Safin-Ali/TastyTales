@@ -14,11 +14,25 @@ const RootLayout: React.FC = () => {
 
 	const dispatch = useDispatch();
 
-	const handleInitUser = (user: User | null) => {
+	const handleInitUser = async (user: User | null) => {
 
 		if (user) {
-			console.log(user);
-			dispatch(signIn(user))
+
+			const {displayName,email,photoURL} = user;
+
+			const userCredential = (await (await fetch(`http://localhost:5000/api/users/register`,{
+				method:'POST',
+				headers:{
+					"Content-Type": "application/json",
+				},
+				body:JSON.stringify({
+					displayName,
+					photoURL,
+					email
+				})
+			})).json());
+
+			dispatch(signIn(userCredential));
 		} else {
 			dispatch(signIn(null))
 		}

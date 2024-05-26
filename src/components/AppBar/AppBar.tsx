@@ -3,11 +3,10 @@ import { HiOutlineMagnifyingGlass } from "react-icons/hi2";
 import Private_NavLinks from '../../private/components/AppBar/Private_NavLinks';
 import Current_Users from '../../private/components/AppBar/Current_Users';
 import { useLocation } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
 import User_Coins from '../../private/components/AppBar/User_Coins';
 import { google_redirect_auth } from '../../firebase/utils/firebase_auth_utils';
-import { authStateChecker } from '../../redux/slicer/userData_slicer';
 
 const routes = [
 	{
@@ -25,8 +24,6 @@ const AppBar: React.FC = () => {
 	const { pathname } = useLocation();
 
 	const { userAuth } = useSelector((state: RootState) => state.userData);
-
-	const dispatch = useDispatch();
 
 	return (
 		<Navbar
@@ -117,7 +114,7 @@ const AppBar: React.FC = () => {
 						userAuth
 						&&
 						<div>
-							<User_Coins coins={ 10 } />
+							<User_Coins coins={ userAuth.coin } />
 						</div>
 					}
 

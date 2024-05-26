@@ -1,21 +1,28 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit'
-import { User } from 'firebase/auth'
+
+export interface UserCredential {
+	email:string,
+	photoURL:string,
+	displayName:string
+	coin:number,
+	reacts:string[]
+}
 
 export interface UserState {
-	userAuth: User | null,
+	userAuth: UserCredential | null,
 	authStateChecked: boolean
 }
 
 const userInitState: UserState = {
 	userAuth: null,
-	authStateChecked: false
+	authStateChecked: false,
 }
 
 export const userDataSlice = createSlice({
 	name: 'counter',
 	initialState: userInitState,
 	reducers: {
-		signIn: (state, action: PayloadAction<User | null>) => {
+		signIn: (state, action: PayloadAction<UserCredential | null>) => {
 			state.userAuth = action.payload
 		},
 		signOut: (state) => {
