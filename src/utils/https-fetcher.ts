@@ -27,4 +27,4 @@ class HttpsFetch {
 	}
 }
 
-export const endpointApi = new HttpsFetch('http://localhost:5000/api');
+export const endpointApi = new HttpsFetch(import.meta.env.VITE_SERVER_API_BASE_PATH);

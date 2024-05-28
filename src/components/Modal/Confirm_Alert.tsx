@@ -34,7 +34,7 @@ const Confirm_Alert: React.FC<PropsType> = ({
 			>
 				<Alert className="!max-w-[420px]" color="primary" withBg={ true }>
 					<Alert.Container className="flex items-start">
-						<Alert.Icon/>
+						<Alert.Icon className={`w-12`}/>
 						<Alert.Body
 							className={ `flex flex-col items-start gap-3 ${className}` }
 								{...attrs}

@@ -16,28 +16,31 @@ const RootLayout: React.FC = () => {
 	const dispatch = useDispatch();
 
 	const handleInitUser = async (user: User | null) => {
+		try {
+			if (user) {
 
-		if (user) {
+				const { displayName, email, photoURL } = user;
 
-			const { displayName, email, photoURL } = user;
+				const userCredential = await (await endpointApi.post('/users/register', {
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({
+						displayName,
+						photoURL,
+						email
+					})
+				})).json()
 
-			const userCredential = await (await endpointApi.post('/users/register', {
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({
-					displayName,
-					photoURL,
-					email
-				})
-			})).json()
+				dispatch(signIn(userCredential));
+			} else {
+				dispatch(signIn(null))
+			}
 
-			dispatch(signIn(userCredential));
-		} else {
-			dispatch(signIn(null))
+
+		} finally {
+			dispatch(authStateChecker(true))
 		}
-
-		dispatch(authStateChecker(true))
 	}
 
 	useEffect(() => {
