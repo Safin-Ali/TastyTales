@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { memo, useState } from 'react';
 import Recipes_Card, { RecipesShortInfo } from '../../components/Card/Recipe_Card';
 import Confirm_Alert from '../../components/Modal/Confirm_Alert';
 import { endpointApi } from '../../utils/https-fetcher';
@@ -10,7 +10,7 @@ import { useLoaderData, useNavigate } from 'react-router-dom';
 export type AlertModalState = { active: boolean, recipeId: string }
 export type AlertModalHandler = (sts: AlertModalState) => void
 
-const Recipes_Page: React.FC = () => {
+const Recipes_Page: React.FC = memo(() => {
 
 	const recipes = useLoaderData() as RecipesShortInfo[];
 
@@ -57,7 +57,7 @@ const Recipes_Page: React.FC = () => {
 									if (res.status === 200) {
 										resolve(true);
 										dismissModal()
-										navigate(`/recipe/${modal.recipeId}`)
+										navigate(`/recipe/${modal.recipeId}?user=${userAuth?.email}`)
 										return
 									}
 									reject(true)
@@ -84,6 +84,6 @@ const Recipes_Page: React.FC = () => {
 				} } />
 		</>
 	);
-}
+})
 
 export default Recipes_Page;

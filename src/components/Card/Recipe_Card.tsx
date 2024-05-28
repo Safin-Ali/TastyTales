@@ -7,10 +7,11 @@ import { google_redirect_auth } from '../../firebase/utils/firebase_auth_utils';
 import { AlertModalHandler } from '../../pages/recipes/Recipes_Page';
 import { endpointApi } from '../../utils/https-fetcher';
 import { handleInstantReact } from '../../redux/slicer/userData_slicer';
+import { useNavigate } from 'react-router-dom';
 
 export interface RecipesShortInfo {
 	_id: string;
-	purchased: number;
+	purchased_by: string[];
 	reacts: number;
 	recipeName: string;
 	creatorEmail: string;
@@ -26,7 +27,7 @@ interface Props extends RecipesShortInfo {
 const RecipesCard: React.FC<Props> = ({
 	_id,
 	country,
-	purchased,
+	purchased_by,
 	reacts,
 	creatorEmail,
 	recipeImage,
@@ -40,16 +41,18 @@ const RecipesCard: React.FC<Props> = ({
 
 	const dispatch = useDispatch();
 
+	const navigate = useNavigate();
+
 	const handleDetails = () => {
 		if (!userAuth) {
-			toast('You need to LogIn', {
+			toast.info('You need to LogIn', {
 				action: {
 					label: 'Sign In',
 					onClick: () => google_redirect_auth(),
 				},
 			});
-		} else if (userAuth.email === creatorEmail) {
-			// visit details page to the user
+		} else if (userAuth.email === creatorEmail || purchased_by.includes(userAuth.email)) {
+			navigate(`/recipe/${_id}?user=${userAuth.email}`)
 		} else if (userAuth && userAuth.coin < 10) {
 			// redirect user to the coin purchase page
 		} else if (userAuth && userAuth.coin > 10) {
@@ -58,8 +61,6 @@ const RecipesCard: React.FC<Props> = ({
 				recipeId: _id
 			})
 		}
-
-
 	};
 
 	const existReact = userAuth?.reacts.includes(_id);
@@ -103,7 +104,6 @@ const RecipesCard: React.FC<Props> = ({
 				<h2 className="text-2xl font-medium mb-2">{ recipeName }</h2>
 
 				<p className="text-sm text-gray-600"><strong>Creator Email:</strong> <a href={ `mailto:${creatorEmail}` } className="text-blue-500">{ creatorEmail }</a></p>
-				<p className="text-sm text-gray-600"><strong>Purchased:</strong> { purchased }</p>
 				<p className="text-sm text-gray-600"><strong>From:</strong> { country }</p>
 
 				<div className="mt-4">
