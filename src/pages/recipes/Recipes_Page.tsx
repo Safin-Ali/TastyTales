@@ -1,15 +1,15 @@
-import React, { memo, useState } from 'react';
-import Recipes_Card, { RecipesShortInfo } from '../../components/Card/Recipe_Card';
-import Confirm_Alert from '../../components/Modal/Confirm_Alert';
-import { endpointApi } from '../../utils/https-fetcher';
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../../redux/store';
 import { toast } from 'keep-react';
-import { useNavigate } from 'react-router-dom';
-import { decInstantCoin } from '../../redux/slicer/userData_slicer';
+import React, { memo, useState } from 'react';
 import { MdSort } from "react-icons/md";
-import { country_names, recipe_categories } from '../../components/data/recipe_form';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import Recipes_Card, { RecipesShortInfo } from '../../components/Card/Recipe_Card';
 import { EmptyData } from '../../components/Empty/EmptyData';
+import Confirm_Alert from '../../components/Modal/Confirm_Alert';
+import { country_names, recipe_categories } from '../../data/recipe_form';
+import { decInstantCoin } from '../../redux/slicer/userData_slicer';
+import { RootState } from '../../redux/store';
+import { endpointApi } from '../../utils/https-fetcher';
 
 export type AlertModalState = { active: boolean, recipeId: string }
 export type AlertModalHandler = (sts: AlertModalState) => void
