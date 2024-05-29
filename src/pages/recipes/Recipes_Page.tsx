@@ -2,10 +2,11 @@ import React, { memo, useState } from 'react';
 import Recipes_Card, { RecipesShortInfo } from '../../components/Card/Recipe_Card';
 import Confirm_Alert from '../../components/Modal/Confirm_Alert';
 import { endpointApi } from '../../utils/https-fetcher';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
 import { toast } from 'keep-react';
 import { useLoaderData, useNavigate } from 'react-router-dom';
+import { decInstantCoin } from '../../redux/slicer/userData_slicer';
 
 export type AlertModalState = { active: boolean, recipeId: string }
 export type AlertModalHandler = (sts: AlertModalState) => void
@@ -17,6 +18,8 @@ const Recipes_Page: React.FC = memo(() => {
 	const [modal, setModalStatus] = useState<AlertModalState>({ active: false, recipeId: '' });
 
 	const { userAuth } = useSelector((state: RootState) => state.userData);
+
+	const dispatch = useDispatch();
 
 	const handleAlertModal: AlertModalHandler = (sts): void => {
 		setModalStatus(sts)
@@ -56,7 +59,7 @@ const Recipes_Page: React.FC = memo(() => {
 								.then((res) => {
 									if (res.status === 200) {
 										resolve(true);
-										dismissModal()
+										dismissModal();
 										navigate(`/recipe/${modal.recipeId}?user=${userAuth?.email}`)
 										return
 									}
@@ -69,8 +72,12 @@ const Recipes_Page: React.FC = memo(() => {
 
 						toast.promise(promise, {
 							loading: 'Processing your request...',
-							success: () => 'Purchase completed successfully',
-							error: 'Purchase failed. Please try again.'
+							success: () => {
+								dispatch(decInstantCoin())
+								return 'Purchase completed successfully'
+							},
+							error: 'Purchase failed. Please try again.',
+							position:'bottom-center'
 						})
 					}
 				} }

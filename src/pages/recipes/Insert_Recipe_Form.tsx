@@ -55,17 +55,20 @@ const Insert_Recipe_Form: React.FC = () => {
 			toast.promise(async () => await handleFormPost(formState
 				),{
 				success:(id) => {
-					navigate(`/recipe/${id}`)
+					navigate(`/recipe/${id}?user=${userAuth?.email}`)
 					return 'Post Successful'
 				},
 				error:(_) => {
 					setFormState({ ...formState, isLoading: false });
 					return 'Post Failed'
 				},
-				loading:'Processing...'
+				loading:'Processing...',
+				position:'bottom-center'
 			})
 		} catch (err) {
-			toast.error('There was an issue with the form submission.')
+			toast.error('There was an issue with the form submission.',{
+				position:'bottom-center'
+			})
 			setFormState({ ...formState, isLoading: false });
 		}
 	};

@@ -50,6 +50,7 @@ const RecipesCard: React.FC<Props> = ({
 					label: 'Sign In',
 					onClick: () => google_redirect_auth(),
 				},
+				position:'bottom-center'
 			});
 		} else if (userAuth.email === creatorEmail || purchased_by.includes(userAuth.email)) {
 			navigate(`/recipe/${_id}?user=${userAuth.email}`)
