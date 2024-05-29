@@ -1,13 +1,13 @@
 import { createBrowserRouter, redirect } from 'react-router-dom';
 import RootLayout from '../layout/RootLayout';
-import Home from '../pages/Home';
-import Recipes_Page from '../pages/recipes/Recipes_Page';
-import { endpointApi } from '../utils/https-fetcher';
-import Recipe_Details from '../pages/recipes/Recipe_Details';
-import Private_Route from './Private_Route';
+import Home from '../pages/home/Home';
 import Insert_Recipe_Form from '../pages/recipes/Insert_Recipe_Form';
-import { store } from '../redux/store';
+import Recipe_Details from '../pages/recipes/Recipe_Details';
+import Recipes_Page from '../pages/recipes/Recipes_Page';
 import { setRecipes } from '../redux/slicer/recipesData_slicer';
+import { store } from '../redux/store';
+import { endpointApi } from '../utils/https-fetcher';
+import Private_Route from './Private_Route';
 
 const router = createBrowserRouter([
 	{

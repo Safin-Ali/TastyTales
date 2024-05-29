@@ -8,6 +8,7 @@ import { authStateChecker, signIn } from '../redux/slicer/userData_slicer';
 import Loading_Screen from '../pages/home/Loading_Screen';
 import { RootState } from '../redux/store';
 import { endpointApi } from '../utils/https-fetcher';
+import Footer from '../components/Footer/Footer';
 
 const RootLayout: React.FC = () => {
 
@@ -60,10 +61,12 @@ const RootLayout: React.FC = () => {
 		<>
 			<AppBar />
 			<main
-				className={ `bg-white container my-5 rounded-2xl mx-auto` }
+				className={ `bg-white min-h-[65dvh] container my-5 rounded-2xl mx-auto` }
 			>
 				<Outlet />
 			</main>
+
+			<Footer/>
 		</>
 	);
 };

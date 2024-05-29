@@ -2,7 +2,7 @@ import { Button, Navbar, Input, Icon } from "keep-react";
 import { HiOutlineMagnifyingGlass } from "react-icons/hi2";
 import Private_NavLinks from '../../private/components/AppBar/Private_NavLinks';
 import Current_Users from '../../private/components/AppBar/Current_Users';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation} from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
 import User_Coins from '../../private/components/AppBar/User_Coins';
@@ -22,8 +22,6 @@ const routes = [
 ]
 
 const AppBar: React.FC = () => {
-
-	const navigate = useNavigate();
 
 	const { pathname } = useLocation();
 
