@@ -2,11 +2,13 @@ import { Button, Navbar, Input, Icon } from "keep-react";
 import { HiOutlineMagnifyingGlass } from "react-icons/hi2";
 import Private_NavLinks from '../../private/components/AppBar/Private_NavLinks';
 import Current_Users from '../../private/components/AppBar/Current_Users';
-import { useLocation } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
 import User_Coins from '../../private/components/AppBar/User_Coins';
 import { google_redirect_auth } from '../../firebase/utils/firebase_auth_utils';
+import React from 'react';
+import { setFilterMode, setFilteredData } from '../../redux/slicer/recipesData_slicer';
 
 const routes = [
 	{
@@ -21,9 +23,24 @@ const routes = [
 
 const AppBar: React.FC = () => {
 
+	const navigate = useNavigate();
+
 	const { pathname } = useLocation();
 
-	const { userAuth } = useSelector((state: RootState) => state.userData);
+	const dispatch = useDispatch();
+
+	const { userData,recipesData } = useSelector((state: RootState) => state);
+
+	const handleSearch = (evt:React.ChangeEvent<HTMLInputElement>) => {
+
+		const fieldVal = evt.currentTarget.value;
+
+		dispatch(setFilterMode(!!fieldVal.length));
+
+		const filteredData = recipesData.data.filter(dt => dt.recipeName.toLowerCase().includes(fieldVal.toLowerCase()));
+
+		dispatch(setFilteredData(filteredData));
+	}
 
 	return (
 		<Navbar
@@ -57,7 +74,7 @@ const AppBar: React.FC = () => {
 						}
 
 						{
-							userAuth
+							userData.userAuth
 							&&
 							<Private_NavLinks currentPath={ pathname } />
 
@@ -86,7 +103,7 @@ const AppBar: React.FC = () => {
 							}
 
 							{
-								userAuth
+								userData.userAuth
 								&&
 								<Private_NavLinks currentPath={ pathname } />
 							}
@@ -98,12 +115,14 @@ const AppBar: React.FC = () => {
 				<Navbar.Container
 					className="lg:flex ml-auto mr-5 hidden items-center justify-between gap-4"
 				>
-					<div className={ `relative` }>
+					<div className={ `relative ${pathname !== '/recipes' && 'select-none'}` }>
 						<Input
 							placeholder="Search recipes"
 							color="gray"
 							type="text"
+							disabled={pathname !== '/recipes'}
 							className={ `ps-10 focus-visible:ring-0` }
+							onChange={pathname !== '/recipes' ? () => null : handleSearch}
 						/>
 						<Icon>
 							<HiOutlineMagnifyingGlass size={ 20 } color="#5E718D" />
@@ -111,23 +130,23 @@ const AppBar: React.FC = () => {
 					</div>
 
 					{
-						userAuth
+						userData.userAuth
 						&&
 						<div>
-							<User_Coins coins={ userAuth.coin } />
+							<User_Coins coins={ userData.userAuth.coin } />
 						</div>
 					}
 
 					<div>
 						<div>
 							{
-								userAuth
+								userData.userAuth
 									?
-									<Current_Users userData={ userAuth } />
+									<Current_Users userData={ userData.userAuth } />
 									:
 									<Button
 										onClick={ () => {
-											!userAuth && google_redirect_auth()
+											!userData.userAuth && google_redirect_auth()
 										} }
 										size={ 'sm' }
 									>

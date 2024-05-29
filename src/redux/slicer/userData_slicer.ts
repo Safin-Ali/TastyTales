@@ -19,7 +19,7 @@ const userInitState: UserState = {
 }
 
 export const userDataSlice = createSlice({
-	name: 'counter',
+	name: 'userCredential',
 	initialState: userInitState,
 	reducers: {
 		signIn: (state, action: PayloadAction<UserCredential | null>) => {

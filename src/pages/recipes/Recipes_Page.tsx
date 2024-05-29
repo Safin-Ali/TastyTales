@@ -1,11 +1,11 @@
 import React, { memo, useState } from 'react';
-import Recipes_Card, { RecipesShortInfo } from '../../components/Card/Recipe_Card';
+import Recipes_Card from '../../components/Card/Recipe_Card';
 import Confirm_Alert from '../../components/Modal/Confirm_Alert';
 import { endpointApi } from '../../utils/https-fetcher';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
 import { toast } from 'keep-react';
-import { useLoaderData, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { decInstantCoin } from '../../redux/slicer/userData_slicer';
 
 export type AlertModalState = { active: boolean, recipeId: string }
@@ -13,11 +13,9 @@ export type AlertModalHandler = (sts: AlertModalState) => void
 
 const Recipes_Page: React.FC = memo(() => {
 
-	const recipes = useLoaderData() as RecipesShortInfo[];
-
 	const [modal, setModalStatus] = useState<AlertModalState>({ active: false, recipeId: '' });
 
-	const { userAuth } = useSelector((state: RootState) => state.userData);
+	const { recipesData,userData } = useSelector((state: RootState) => state);
 
 	const dispatch = useDispatch();
 
@@ -31,14 +29,14 @@ const Recipes_Page: React.FC = memo(() => {
 
 	const navigate = useNavigate();
 
-	if (!recipes.length) return <div>no recipes found</div>
+	if (!recipesData.data.length) return <div>no recipes found</div>
 
 	return (
 		<>
 			<section className={ `py-5` }>
 				<div className="flex items-center flex-col gap-5 justify-center">
 					{
-						recipes.map((res, idx) => {
+						recipesData[recipesData.filteredData.length ? 'filteredData' : 'data'].map((res, idx) => {
 							return <Recipes_Card
 								alertModalHandler={ handleAlertModal }
 								{ ...res }
@@ -55,12 +53,12 @@ const Recipes_Page: React.FC = memo(() => {
 					cb: () => {
 
 						const promise = new Promise((resolve, reject) => {
-							endpointApi.post(`/purchase/recipe?userEmail=${userAuth?.email}&recipesId=${modal.recipeId}`)
+							endpointApi.post(`/purchase/recipe?userEmail=${userData.userAuth?.email}&recipesId=${modal.recipeId}`)
 								.then((res) => {
 									if (res.status === 200) {
 										resolve(true);
 										dismissModal();
-										navigate(`/recipe/${modal.recipeId}?user=${userAuth?.email}`)
+										navigate(`/recipe/${modal.recipeId}?user=${userData.userAuth?.email}`)
 										return
 									}
 									reject(true)
@@ -77,7 +75,7 @@ const Recipes_Page: React.FC = memo(() => {
 								return 'Purchase completed successfully'
 							},
 							error: 'Purchase failed. Please try again.',
-							position:'bottom-center'
+							position: 'bottom-center'
 						})
 					}
 				} }

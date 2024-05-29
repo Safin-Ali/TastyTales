@@ -6,6 +6,8 @@ import { endpointApi } from '../utils/https-fetcher';
 import Recipe_Details from '../pages/recipes/Recipe_Details';
 import Private_Route from './Private_Route';
 import Insert_Recipe_Form from '../pages/recipes/Insert_Recipe_Form';
+import { store } from '../redux/store';
+import { setRecipes } from '../redux/slicer/recipesData_slicer';
 
 const router = createBrowserRouter([
 	{
@@ -44,6 +46,8 @@ const router = createBrowserRouter([
 				loader: (async () => {
 					try {
 						const result = await (await endpointApi.get(`/recipe/getRecipes`)).json();
+
+						store.dispatch(setRecipes(result));
 
 						return result.length > 0 ? result : []
 					} catch (error) {
