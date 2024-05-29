@@ -7,3 +7,9 @@
 body {
 	@apply bg-primary-25 text-metal-900;
 }
+select {
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	text-indent: 1px;
+	text-overflow: '';
+}

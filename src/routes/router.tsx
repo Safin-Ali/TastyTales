@@ -5,6 +5,7 @@ import Recipes_Page from '../pages/recipes/Recipes_Page';
 import { endpointApi } from '../utils/https-fetcher';
 import Recipe_Details from '../pages/recipes/Recipe_Details';
 import Private_Route from './Private_Route';
+import Insert_Recipe_Form from '../pages/recipes/Insert_Recipe_Form';
 
 const router = createBrowserRouter([
 	{
@@ -25,11 +26,11 @@ const router = createBrowserRouter([
 
 						const result = await (await endpointApi.get(`/recipe/getRecipe/${params.id}`)).json();
 
-						if(!result || !result?.purchased_by.includes(userEmail)) {
-							return redirect('/')
-						}
+						if(!result) return redirect('/');
 
-						return result
+						if(result.creatorEmail === userEmail || result.purchased_by.includes(userEmail)) return result;
+
+						return redirect('/')
 
 
 					} catch (error) {
@@ -51,6 +52,10 @@ const router = createBrowserRouter([
 				}),
 				element: <Recipes_Page />
 			},
+			{
+				path:'/addRecipe',
+				element:<Private_Route><Insert_Recipe_Form/></Private_Route>
+			}
 		]
 	},
 ])

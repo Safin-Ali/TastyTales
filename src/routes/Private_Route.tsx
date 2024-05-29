@@ -12,8 +12,10 @@ const Private_Route: React.FC<PropsType> = ({ children }) => {
 	const navigate = useNavigate();
 
 	if(!userAuth) {
-		toast.error('You need to LogIn');
-		navigate(-1)
+		toast.error('You need to LogIn',{
+			position:'bottom-center'
+		});
+		navigate(-1);
 		return
 	}
 
