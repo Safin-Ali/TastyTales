@@ -13,6 +13,7 @@ export interface RecipesShortInfo {
 	_id: string;
 	purchased_by: string[];
 	reacts: number;
+	category:string;
 	recipeName: string;
 	creatorEmail: string;
 	recipeImage: string;
