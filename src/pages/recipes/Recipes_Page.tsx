@@ -44,17 +44,29 @@ const Recipes_Page: React.FC = memo(() => {
 
 		const value = arg.evt.currentTarget.value.toLowerCase();
 
-		if(value === 'null') return;
-
-		const sortedData = recipesData[recipesData.filteredData.length ? 'filteredData' : 'data'].filter(dt => dt[arg.type].toLowerCase().includes(value));
-
-		if(!sortedData.length) {
-			toast.info('No recipes found',{
-				position:'bottom-center'
-			});
-			return
+		if(value === 'null') {
+			if(sortedRecipes.length){
+				setSortedRecipes(sortedRecipes)
+			}
 		}
 
+		let sortedData:RecipesShortInfo[] | [] = []
+
+		if(sortedRecipes.length) {
+			sortedRecipes.filter(dt => dt[arg.type].toLowerCase().includes(value));
+		} else {
+			sortedData = recipesData[recipesData.filteredData.length ? 'filteredData' : 'data'].filter(dt => dt[arg.type].toLowerCase().includes(value));
+		}
+
+		if(!sortedData.length) {
+			if(value !== 'null') {
+				toast.info('No recipes found',{
+					position:'bottom-center'
+				});
+			}
+			setSortedRecipes([])
+			return
+		}
 		setSortedRecipes(sortedData);
 	}
 
