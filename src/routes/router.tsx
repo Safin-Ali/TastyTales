@@ -8,6 +8,7 @@ import { setRecipes } from '../redux/slicer/recipesData_slicer';
 import { store } from '../redux/store';
 import { endpointApi } from '../utils/https-fetcher';
 import Private_Route from './Private_Route';
+import Coins_Plan from '../pages/price_plan/Coins_Plan';
 
 const router = createBrowserRouter([
 	{
@@ -59,7 +60,11 @@ const router = createBrowserRouter([
 			{
 				path:'/addRecipe',
 				element:<Private_Route><Insert_Recipe_Form/></Private_Route>
-			}
+			},
+			{
+				path:'/coins',
+				element:<Private_Route ><Coins_Plan/></Private_Route>
+			},
 		]
 	},
 ])

@@ -56,7 +56,7 @@ const RecipesCard: React.FC<Props> = ({
 		} else if (userAuth.email === creatorEmail || purchased_by.includes(userAuth.email)) {
 			navigate(`/recipe/${_id}?user=${userAuth.email}`)
 		} else if (userAuth && userAuth.coin < 10) {
-			// redirect user to the coin purchase page
+			navigate('/coins')
 		} else if (userAuth && userAuth.coin > 10) {
 			alertModalHandler({
 				active: true,

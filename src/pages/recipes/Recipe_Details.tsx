@@ -18,7 +18,7 @@ interface RecipeDetails {
 	similarRecipe: {
 		_id: string;
 		recipeName: string;
-		recipeImage:string
+		recipeImage: string
 	}[];
 }
 
@@ -104,26 +104,27 @@ const RecipeDetails: React.FC = () => {
 				></iframe>
 			</div>
 			{
-				similarRecipe.length &&
-				<div className="mt-4">
-				<h2 className="text-xl font-bold mb-2">Recipe Suggestions</h2>
-				<div className="flex gap-4">
-					{ similarRecipe.slice(0,4).map(suggestion => (
-						<div
-						key={ suggestion._id }
-						className="border w-1/4 p-4 rounded-lg cursor-pointer"
-						onClick={() => {
-							naviagte(`/recipe/${suggestion._id}?user=${userAuth?.email}`)
-						}}
-						>
-							<h3 className="text-lg font-bold mb-2">
-								{ suggestion.recipeName }
-							</h3>
-							<img src={ suggestion.recipeImage } alt={ `${suggestion.recipeName}_thumbnail` } className="w-full h-auto rounded-lg" />
+				similarRecipe.length ?
+					<div className="mt-4">
+						<h2 className="text-xl font-bold mb-2">Recipe Suggestions</h2>
+						<div className="flex gap-4">
+							{ similarRecipe.slice(0, 4).map(suggestion => (
+								<div
+									key={ suggestion._id }
+									className="border w-1/4 p-4 rounded-lg cursor-pointer"
+									onClick={ () => {
+										naviagte(`/recipe/${suggestion._id}?user=${userAuth?.email}`)
+									} }
+								>
+									<h3 className="text-lg font-bold mb-2">
+										{ suggestion.recipeName }
+									</h3>
+									<img src={ suggestion.recipeImage } alt={ `${suggestion.recipeName}_thumbnail` } className="w-full h-auto rounded-lg" />
+								</div>
+							)) }
 						</div>
-					)) }
-				</div>
-			</div>
+					</div>
+					: <></>
 			}
 		</section>
 	);

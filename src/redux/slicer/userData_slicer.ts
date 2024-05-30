@@ -60,10 +60,21 @@ export const userDataSlice = createSlice({
 				coin:currentCoint < 0 ? 0 : currentCoint - 10
 			}
 		},
+		incInstantCoin: (state,action:PayloadAction<number>) => {
+
+			if(!state.userAuth) return;
+
+			const currentCoint = state.userAuth.coin;
+
+			state.userAuth = {
+				...state.userAuth,
+				coin:currentCoint + action.payload
+			}
+		},
 	},
 })
 
 // Action creators are generated for each case reducer function
-export const { signIn, signOut,decInstantCoin, authStateChecker,handleInstantReact } = userDataSlice.actions
+export const { signIn, signOut,decInstantCoin, incInstantCoin, authStateChecker,handleInstantReact } = userDataSlice.actions
 
 export default userDataSlice.reducer
