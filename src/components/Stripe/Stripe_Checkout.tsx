@@ -12,6 +12,7 @@ import { useNavigate } from 'react-router-dom';
 const Stripe_Checkout: React.FC = () => {
 
 	const [clientSec, setClientSec] = useState<string>('');
+	const [paymentLoad, setPaymentLoad] = useState<boolean>(false);
 
 	const { userAuth } = useSelector((state: RootState) => state.userData);
 
@@ -25,46 +26,56 @@ const Stripe_Checkout: React.FC = () => {
 	const handlePayment = async (event: React.FormEvent) => {
 		event.preventDefault();
 
-		if (!stripe || !elements) {
-			return;
-		}
-
-		const { error, paymentIntent } = await stripe.confirmCardPayment(clientSec, {
-			payment_method: {
-				card: elements.getElement(CardElement)!,
-			},
-		});
-
-		if (error) {
-			toast.error('Payment failed!',{
-				position:'bottom-center'
-			})
-			setClientSec('');
-		} else if (paymentIntent?.status === 'succeeded') {
+		const promise = async() => {
 			try {
-				const response = await endpointApi.patch('/users/updateCoins',{
-					headers: {
-						'Content-Type': 'application/json',
+				setPaymentLoad(!paymentLoad)
+				if (!stripe || !elements) {
+					throw new Error();
+				}
+
+				const { error, paymentIntent } = await stripe.confirmCardPayment(clientSec, {
+					payment_method: {
+						card: elements.getElement(CardElement)!,
 					},
-					body:JSON.stringify({paymentIntentId:paymentIntent.id,email:userAuth?.email})
-				})
-				if(response.status === 200) {
-					toast.success('Payment successful!',{
-						position:'bottom-center'
-					})
-					const {coins} = await response.json();
-					dispatch(incInstantCoin(parseInt(coins)));
+				});
+
+				if (error) {
 					setClientSec('');
-					navigate('/recipes');
-					return
+				} else if (paymentIntent?.status === 'succeeded') {
+					try {
+						const response = await endpointApi.patch('/users/updateCoins',{
+							headers: {
+								'Content-Type': 'application/json',
+							},
+							body:JSON.stringify({paymentIntentId:paymentIntent.id,email:userAuth?.email})
+						})
+						if(response.status === 200) {
+							const {coins} = await response.json();
+							dispatch(incInstantCoin(parseInt(coins)));
+							setClientSec('');
+							return
+						}
+					} catch (error) {
+						throw new Error();
+					}
 				}
 			} catch (error) {
-				toast.error('Payment failed!',{
-					position:'bottom-center'
-				})
 				setClientSec('');
+			} finally {
+				setClientSec('');
+				setPaymentLoad(!paymentLoad)
 			}
 		}
+
+		toast.promise(promise,{
+			success:() => {
+				navigate('/recipes');
+				return 'Payment success!'
+			},
+			position:'bottom-center',
+			loading:'Payment processing...',
+			error:'Payment failed!'
+		})
 	};
 
 	const handleModal = () => {
@@ -90,9 +101,10 @@ const Stripe_Checkout: React.FC = () => {
 							<Button
 								type="submit"
 								size={ 'xs' }
-								disabled={ !stripe }
+								className={paymentLoad ? 'opacity-40 select-none' : ''}
+								disabled={ paymentLoad }
 							>
-								Confirm
+								PAY
 							</Button>
 						</div>
 					</form>
