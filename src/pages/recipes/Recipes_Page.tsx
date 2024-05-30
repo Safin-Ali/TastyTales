@@ -2,7 +2,7 @@ import { toast } from 'keep-react';
 import React, { memo, useState } from 'react';
 import { MdSort } from "react-icons/md";
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useNavigation } from 'react-router-dom';
 import Recipes_Card, { RecipesShortInfo } from '../../components/Card/Recipe_Card';
 import { EmptyData } from '../../components/Empty/EmptyData';
 import Confirm_Alert from '../../components/Modal/Confirm_Alert';
@@ -11,6 +11,7 @@ import { decInstantCoin } from '../../redux/slicer/userData_slicer';
 import { RootState } from '../../redux/store';
 import { endpointApi } from '../../utils/https-fetcher';
 import { getJwt } from '../../utils/common';
+import Loading_Screen from '../home/Loading_Screen';
 
 export type AlertModalState = { active: boolean, recipeId: string }
 export type AlertModalHandler = (sts: AlertModalState) => void
@@ -41,6 +42,8 @@ const Recipes_Page: React.FC = memo(() => {
 
 	const navigate = useNavigate();
 
+	const {state} = useNavigation();
+
 	const handleSort = (arg:SortHandlerParams) => {
 
 		const value = arg.evt.currentTarget.value.toLowerCase();
@@ -70,6 +73,8 @@ const Recipes_Page: React.FC = memo(() => {
 		}
 		setSortedRecipes(sortedData);
 	}
+
+	if(state === 'loading') return <Loading_Screen text={'Loading Recipes...'}/>
 
 	if (!recipesData.data.length) return <EmptyData/>
 

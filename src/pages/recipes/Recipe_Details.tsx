@@ -1,7 +1,8 @@
 import React from 'react';
-import { useLoaderData, useNavigate } from 'react-router-dom';
+import { useLoaderData, useNavigate, useNavigation } from 'react-router-dom';
 import { RootState } from '../../redux/store';
 import { useSelector } from 'react-redux';
+import Loading_Screen from '../home/Loading_Screen';
 interface RecipeDetails {
 	_id: string;
 	recipeName: string;
@@ -41,6 +42,10 @@ const RecipeDetails: React.FC = () => {
 	const { userAuth } = useSelector((state: RootState) => state.userData);
 
 	const naviagte = useNavigate();
+
+	const {state} = useNavigation();
+
+	if(state === 'loading') return <Loading_Screen text={'Loading Recipe Info...'}/>
 
 	return (
 		<section className="container mx-auto p-10">
