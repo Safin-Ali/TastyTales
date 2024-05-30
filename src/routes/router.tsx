@@ -9,6 +9,7 @@ import { store } from '../redux/store';
 import { endpointApi } from '../utils/https-fetcher';
 import Private_Route from './Private_Route';
 import Coins_Plan from '../pages/price_plan/Coins_Plan';
+import { getJwt } from '../utils/common';
 
 const router = createBrowserRouter([
 	{
@@ -27,7 +28,11 @@ const router = createBrowserRouter([
 
 						const userEmail = new URLSearchParams(new URL(request.url).search).get('user');
 
-						const result = await (await endpointApi.get(`/recipe/getRecipe/${params.id}`)).json();
+						const result = await (await endpointApi.get(`/recipe/getRecipe/${params.id}`,{
+							headers:{
+								'Authorization':getJwt(),
+							}
+						})).json();
 
 						if(!result) return redirect('/');
 

@@ -8,6 +8,7 @@ import { AlertModalHandler } from '../../pages/recipes/Recipes_Page';
 import { endpointApi } from '../../utils/https-fetcher';
 import { handleInstantReact } from '../../redux/slicer/userData_slicer';
 import { useNavigate } from 'react-router-dom';
+import { getJwt } from '../../utils/common';
 
 export interface RecipesShortInfo {
 	_id: string;
@@ -70,6 +71,7 @@ const RecipesCard: React.FC<Props> = ({
 	const handleReact = async () => {
 		const res = await endpointApi.patch(`/recipe/addReact`, {
 			headers: {
+				'Authorization':getJwt(),
 				"Content-Type": "application/json",
 			},
 			body: JSON.stringify({

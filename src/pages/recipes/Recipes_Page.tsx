@@ -10,6 +10,7 @@ import { country_names, recipe_categories } from '../../data/recipe_form';
 import { decInstantCoin } from '../../redux/slicer/userData_slicer';
 import { RootState } from '../../redux/store';
 import { endpointApi } from '../../utils/https-fetcher';
+import { getJwt } from '../../utils/common';
 
 export type AlertModalState = { active: boolean, recipeId: string }
 export type AlertModalHandler = (sts: AlertModalState) => void
@@ -138,7 +139,11 @@ const Recipes_Page: React.FC = memo(() => {
 					cb: () => {
 
 						const promise = new Promise((resolve, reject) => {
-							endpointApi.post(`/purchase/recipe?userEmail=${userData.userAuth?.email}&recipesId=${modal.recipeId}`)
+							endpointApi.get(`/purchase/recipe?userEmail=${userData.userAuth?.email}&recipesId=${modal.recipeId}`,{
+								headers:{
+									'Authorization':getJwt(),
+								}
+							})
 								.then((res) => {
 									if (res.status === 200) {
 										resolve(true);

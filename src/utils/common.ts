@@ -44,3 +44,5 @@ export const handleImageUpload = async (imageData:File) => {
 		throw new Error('Error uploading recipe thumbnail')
     }
 }
+
+export const getJwt = ():string => `Bearer ${localStorage.getItem('authToken')}`!

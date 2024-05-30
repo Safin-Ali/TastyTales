@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
 import { incInstantCoin } from '../../redux/slicer/userData_slicer';
 import { useNavigate } from 'react-router-dom';
+import { getJwt } from '../../utils/common';
 
 const Stripe_Checkout: React.FC = () => {
 
@@ -45,6 +46,7 @@ const Stripe_Checkout: React.FC = () => {
 					try {
 						const response = await endpointApi.patch('/users/updateCoins',{
 							headers: {
+								'Authorization':getJwt(),
 								'Content-Type': 'application/json',
 							},
 							body:JSON.stringify({paymentIntentId:paymentIntent.id,email:userAuth?.email})

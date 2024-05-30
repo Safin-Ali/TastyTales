@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 import AppBar from '../components/AppBar/AppBar';
-import { onAuthStateChangeList } from '../firebase/utils/firebase_auth_utils';
+import { logOutUser, onAuthStateChangeList } from '../firebase/utils/firebase_auth_utils';
 import { User } from 'firebase/auth';
 import { useDispatch, useSelector } from 'react-redux';
 import { authStateChecker, signIn } from '../redux/slicer/userData_slicer';
@@ -31,14 +31,29 @@ const RootLayout: React.FC = () => {
 						photoURL,
 						email
 					})
-				})).json()
+				})).json();
+
+				const authToken = localStorage.getItem('authToken');
+
+				if (!authToken) {
+					const jwt = (await (await endpointApi.get('/jwt',{
+						headers:{
+							Email:userCredential.email
+						}
+					})).json()).encryptJWTToken;
+					localStorage.setItem('authToken', jwt);
+				}
 
 				dispatch(signIn(userCredential));
 			} else {
 				dispatch(signIn(null))
+				logOutUser()
 			}
 
 
+		} catch (err) {
+			logOutUser()
+			dispatch(signIn(null))
 		} finally {
 			dispatch(authStateChecker(true))
 		}
@@ -66,7 +81,7 @@ const RootLayout: React.FC = () => {
 				<Outlet />
 			</main>
 
-			<Footer/>
+			<Footer />
 		</>
 	);
 };

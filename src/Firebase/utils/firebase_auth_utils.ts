@@ -25,6 +25,7 @@ export const google_redirect_auth = async (): Promise<void> => {
 export const logOutUser = (): void => {
 	if (!firebaseAuth.currentUser) return;
 	signOut(firebaseAuth)
+	localStorage.removeItem('authToken')
 }
 
 export const onAuthStateChangeList = (cb: (userData: User | null) => void): Unsubscribe => {

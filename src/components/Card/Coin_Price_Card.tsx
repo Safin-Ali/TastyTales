@@ -1,5 +1,6 @@
 import { Button } from 'keep-react';
 import { endpointApi } from '../../utils/https-fetcher';
+import { getJwt } from '../../utils/common';
 
 interface Props {
 	readonly price: number
@@ -13,6 +14,7 @@ const Coin_Price_Card: React.FC<Props> = ({ coins, price,cb }) => {
 		const response = endpointApi.post('/purchase/createPaymentIntent', {
 			method: 'POST',
 			headers: {
+				'Authorization':getJwt(),
 				'Content-Type': 'application/json',
 			},
 			body: JSON.stringify({ amount:price }),
