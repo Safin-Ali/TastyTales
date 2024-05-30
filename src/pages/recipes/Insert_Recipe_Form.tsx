@@ -9,6 +9,7 @@ import { handleFormPost } from '../../utils/common';
 
 export interface FormState {
 	recipeName: string;
+	recipeCreator:string
 	creatorEmail:string;
 	ytTutorial: string;
 	recipeCategories: string;
@@ -27,6 +28,7 @@ const Insert_Recipe_Form: React.FC = () => {
 	const [formState, setFormState] = useState<FormState>({
 		recipeName: '',
 		ytTutorial: '',
+		recipeCreator:userAuth?.displayName || '',
 		creatorEmail:(userAuth?.email) || '',
 		recipeCategories: 'null',
 		country: 'null',

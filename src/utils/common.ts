@@ -14,6 +14,7 @@ export const handleFormPost = async (data:FormState):Promise<Response> => {
 			body:JSON.stringify({...rest,recipeImage:imageUrl.url}),
 			headers: {
 				"Content-Type": "application/json",
+				'Authorization':getJwt(),
 			}
 		})).json();
 
