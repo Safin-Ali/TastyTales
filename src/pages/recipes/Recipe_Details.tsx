@@ -45,7 +45,7 @@ const RecipeDetails: React.FC = () => {
 
 	const {state} = useNavigation();
 
-	if(state === 'loading') return <Loading_Screen text={'Loading Recipe Info...'}/>
+	if(state === 'loading') return <Loading_Screen text={'Processing Recipe Data...'}/>
 
 	return (
 		<section className="container mx-auto p-10">

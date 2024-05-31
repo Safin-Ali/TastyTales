@@ -1,5 +1,5 @@
-import { toast } from 'keep-react';
-import React, { memo, useState } from 'react';
+import { Spinner, toast } from 'keep-react';
+import React, { memo, useEffect, useRef, useState } from 'react';
 import { MdSort } from "react-icons/md";
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useNavigation } from 'react-router-dom';
@@ -12,13 +12,14 @@ import { RootState } from '../../redux/store';
 import { endpointApi } from '../../utils/https-fetcher';
 import { getJwt } from '../../utils/common';
 import Loading_Screen from '../home/Loading_Screen';
+import { setRecipes } from '../../redux/slicer/recipesData_slicer';
 
 export type AlertModalState = { active: boolean, recipeId: string }
 export type AlertModalHandler = (sts: AlertModalState) => void
 
 type SortHandlerParams = {
-	readonly type:'country' | 'category';
-	readonly evt:React.ChangeEvent<HTMLSelectElement>
+	readonly type: 'country' | 'category';
+	readonly evt: React.ChangeEvent<HTMLSelectElement>
 }
 
 const Recipes_Page: React.FC = memo(() => {
@@ -28,7 +29,13 @@ const Recipes_Page: React.FC = memo(() => {
 
 	const { recipesData, userData } = useSelector((state: RootState) => state);
 
-	const [sortedRecipes,setSortedRecipes] = useState<RecipesShortInfo[] | []>([]);
+	const [sortedRecipes, setSortedRecipes] = useState<RecipesShortInfo[] | []>([]);
+
+	const spinnerRef = useRef<HTMLDivElement>(null);
+
+	const [reached, setReached] = useState<boolean>(false);
+
+	const rangeRef = useRef<number>(1);
 
 	const dispatch = useDispatch();
 
@@ -42,41 +49,81 @@ const Recipes_Page: React.FC = memo(() => {
 
 	const navigate = useNavigate();
 
-	const {state} = useNavigation();
+	const { state } = useNavigation();
 
-	const handleSort = (arg:SortHandlerParams) => {
+	const handleSort = (arg: SortHandlerParams) => {
 
 		const value = arg.evt.currentTarget.value.toLowerCase();
 
-		if(value === 'null') {
-			if(sortedRecipes.length){
+		if (value === 'null') {
+			if (sortedRecipes.length) {
 				setSortedRecipes(sortedRecipes)
 			}
 		}
 
-		let sortedData:RecipesShortInfo[] | [] = []
+		let sortedData: RecipesShortInfo[] | [] = []
 
-		if(sortedRecipes.length) {
+		if (sortedRecipes.length) {
 			sortedRecipes.filter(dt => dt[arg.type].toLowerCase().includes(value));
 		} else {
 			sortedData = recipesData[recipesData.filteredData.length ? 'filteredData' : 'data'].filter(dt => dt[arg.type].toLowerCase().includes(value));
 		}
 
-		if(!sortedData.length) {
-			if(value !== 'null') {
-				toast.info('No recipes found',{
-					position:'bottom-center'
+		if (!sortedData.length) {
+			if (value !== 'null') {
+				toast.info('No recipes found', {
+					position: 'bottom-center'
 				});
 			}
 			setSortedRecipes([])
 			return
 		}
 		setSortedRecipes(sortedData);
-	}
+	};
 
-	if(state === 'loading') return <Loading_Screen text={'Loading Recipes...'}/>
+	const interSectionObserverCb = async ([entry]: IntersectionObserverEntry[]) => {
 
-	if (!recipesData.data.length) return <EmptyData/>
+		if (entry.isIntersecting && !reached) {
+			const newRange = rangeRef.current * 5;
+			const res = await endpointApi.get(`/recipe/getRecipes?r=${newRange}`);
+			if (res.status === 200) {
+				const data: RecipesShortInfo[] | [] = await res.json();
+				dispatch(setRecipes([...recipesData.data, ...data]));
+				rangeRef.current = rangeRef.current + 1;
+
+				if (data.length < 5) {
+					setReached(() => true);
+				}
+			}
+
+		}
+	};
+
+
+	useEffect(() => {
+		const observer = new IntersectionObserver(
+			interSectionObserverCb,
+			{
+				root: null,
+				rootMargin: '0px',
+				threshold: 1,
+			}
+		);
+
+		if (spinnerRef.current) {
+			observer.observe(spinnerRef.current); // Start observing the spinner element
+		}
+
+		return () => {
+			if (spinnerRef.current) {
+				observer.unobserve(spinnerRef.current); // Stop observing when component unmounts
+			}
+		};
+	}, [recipesData]);
+
+	if (state === 'loading') return <Loading_Screen text={ 'Retrieving Recipe Information...' } />
+
+	if (!recipesData.data.length) return <EmptyData />
 
 	return (
 		<>
@@ -88,7 +135,7 @@ const Recipes_Page: React.FC = memo(() => {
 
 						<div>
 							<select
-								onChange={(evt:React.ChangeEvent<HTMLSelectElement>) => handleSort({type:'category',evt}) }
+								onChange={ (evt: React.ChangeEvent<HTMLSelectElement>) => handleSort({ type: 'category', evt }) }
 								className={ `border cursor-pointer mx-2 w-fit text-center focus-visible:outline-none py-2 [&>option]:text-metal-900 rounded-lg` }
 							>
 								<option value="null" defaultValue={ 'null' }>Category</option>
@@ -103,7 +150,7 @@ const Recipes_Page: React.FC = memo(() => {
 
 							<select
 								className={ `border cursor-pointer mx-2 w-fit text-center focus-visible:outline-none py-2 [&>option]:text-metal-900 rounded-lg` }
-								onChange={(evt:React.ChangeEvent<HTMLSelectElement>) => handleSort({type:'country',evt}) }
+								onChange={ (evt: React.ChangeEvent<HTMLSelectElement>) => handleSort({ type: 'country', evt }) }
 							>
 								<option value="null" defaultValue={ 'null' }>Country</option>
 								{
@@ -119,22 +166,31 @@ const Recipes_Page: React.FC = memo(() => {
 					</div>
 					{
 						!sortedRecipes.length
-						?
-						recipesData[recipesData.filteredData.length ? 'filteredData' : 'data'].map((res, idx) => {
-							return <Recipes_Card
-								alertModalHandler={ handleAlertModal }
-								{ ...res }
-								key={ idx } />
-						})
-						:
-						sortedRecipes.map((res, idx) => {
-							return <Recipes_Card
-								alertModalHandler={ handleAlertModal }
-								{ ...res }
-								key={ idx } />
-						})
+							?
+							recipesData[recipesData.filteredData.length ? 'filteredData' : 'data'].map((res, idx) => {
+								return <Recipes_Card
+									alertModalHandler={ handleAlertModal }
+									{ ...res }
+									key={ idx } />
+							})
+							:
+							sortedRecipes.map((res, idx) => {
+								return <Recipes_Card
+									alertModalHandler={ handleAlertModal }
+									{ ...res }
+									key={ idx } />
+							})
 					}
 				</div>
+				{
+					reached
+						?
+						<></>
+						:
+						<div className={ `w-fit mx-auto mt-8` } ref={ spinnerRef }>
+							<Spinner size={ 'lg' } />
+						</div>
+				}
 			</section>
 			<Confirm_Alert
 				alertTitle={ 'Confirm Recipe Purchase' }
@@ -144,9 +200,9 @@ const Recipes_Page: React.FC = memo(() => {
 					cb: () => {
 
 						const promise = new Promise((resolve, reject) => {
-							endpointApi.get(`/purchase/recipe?userEmail=${userData.userAuth?.email}&recipesId=${modal.recipeId}`,{
-								headers:{
-									'Authorization':getJwt(),
+							endpointApi.get(`/purchase/recipe?userEmail=${userData.userAuth?.email}&recipesId=${modal.recipeId}`, {
+								headers: {
+									'Authorization': getJwt(),
 								}
 							})
 								.then((res) => {

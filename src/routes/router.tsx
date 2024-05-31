@@ -51,7 +51,7 @@ const router = createBrowserRouter([
 				path: '/recipes',
 				loader: (async () => {
 					try {
-						const result = await (await endpointApi.get(`/recipe/getRecipes`)).json();
+						const result = await (await endpointApi.get(`/recipe/getRecipes?r=0`)).json();
 
 						store.dispatch(setRecipes(result));
 
